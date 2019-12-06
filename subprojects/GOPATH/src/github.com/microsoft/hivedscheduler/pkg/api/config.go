@@ -64,12 +64,12 @@ type Config struct {
 	ForcePodBindThreshold *int32 `yaml:"forcePodBindThreshold"`
 
 	// If a Pod is decided to be PodWaiting, it will block the whole scheduling by
-	// WaitingPodSchedulingBlockSec.
+	// WaitingPodSchedulingBlockMilliSec.
 	// Large value can be used to achieve stronger FIFO scheduling by sacrificing
 	// the scheduling throughput.
 	// This is a workaround until PodMaxBackoffSeconds can be configured for
 	// K8S Default Scheduler.
-	WaitingPodSchedulingBlockSec *int64 `yaml:"waitingPodSchedulingBlockSec"`
+	WaitingPodSchedulingBlockMilliSec *int64 `yaml:"waitingPodSchedulingBlockMilliSec"`
 
 	// Specify the whole physical cluster
 	// TODO: Automatically construct it based on node info from GPU and Network Device Plugins
@@ -94,6 +94,9 @@ func NewConfig(configPath *string) *Config {
 	}
 	if c.ForcePodBindThreshold == nil {
 		c.ForcePodBindThreshold = common.PtrInt32(3)
+	}
+	if c.WaitingPodSchedulingBlockMilliSec == nil {
+		c.WaitingPodSchedulingBlockMilliSec = common.PtrInt64(500)
 	}
 	if c.PhysicalCluster == nil {
 		c.PhysicalCluster = defaultPhysicalCluster()
