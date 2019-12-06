@@ -517,7 +517,8 @@ func (s *HivedScheduler) filterRoutine(args ei.ExtenderArgs) *ei.ExtenderFilterR
 		if s.shouldForceBind(s.podScheduleStatuses[pod.UID], suggestedNodes) {
 			go s.forceBindExecutor(bindingPod)
 		}
-		klog.Infof(logPfx + "Pod is binding: %v", result.PodBindInfo)
+
+		klog.Infof(logPfx + "Pod is binding: %v", common.ToJson(result.PodBindInfo))
 		return &ei.ExtenderFilterResult{
 			NodeNames: &[]string{bindingPod.Spec.NodeName},
 		}
@@ -540,7 +541,8 @@ func (s *HivedScheduler) filterRoutine(args ei.ExtenderArgs) *ei.ExtenderFilterR
 				failedNodes[node] += ", " + internal.Key(victim)
 			}
 		}
-		klog.Infof(logPfx + "Pod is preempting: %v", result.PodPreemptInfo)
+
+		klog.Infof(logPfx + "Pod is preempting: %v", common.ToJson(result.PodPreemptInfo))
 		return &ei.ExtenderFilterResult{
 			FailedNodes: failedNodes,
 		}
@@ -562,7 +564,8 @@ func (s *HivedScheduler) filterRoutine(args ei.ExtenderArgs) *ei.ExtenderFilterR
 		if result.PodWaitInfo != nil {
 			waitReason += ": " + result.PodWaitInfo.Reason
 		}
-		klog.Infof(logPfx + "Pod is waiting: %v", result.PodWaitInfo)
+
+		klog.Infof(logPfx + "Pod is waiting: %v", common.ToJson(result.PodWaitInfo))
 		return &ei.ExtenderFilterResult{
 			Error: waitReason,
 		}
