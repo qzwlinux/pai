@@ -549,14 +549,12 @@ func (s *HivedScheduler) filterRoutine(args ei.ExtenderArgs) *ei.ExtenderFilterR
 		}
 
 		// Return Error to tell K8S Default Scheduler that preemption must not help.
+		waitReason := "Pod is waiting for preemptible or free resource to appear"
 		if result.PodWaitInfo != nil {
-			return &ei.ExtenderFilterResult{
-				Error: fmt.Sprintf(
-					"Pod is waiting for preemptible or free resource to appear: %v",
-					result.PodWaitInfo.Reason),
-			}
-		} else {
-			return &ei.ExtenderFilterResult{}
+			waitReason += ": " + result.PodWaitInfo.Reason
+		}
+		return &ei.ExtenderFilterResult{
+			Error: waitReason,
 		}
 	}
 }
