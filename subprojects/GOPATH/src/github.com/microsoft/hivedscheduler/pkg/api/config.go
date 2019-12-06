@@ -96,7 +96,7 @@ func NewConfig(configPath *string) *Config {
 		c.ForcePodBindThreshold = common.PtrInt32(3)
 	}
 	if c.WaitingPodSchedulingBlockMilliSec == nil {
-		c.WaitingPodSchedulingBlockMilliSec = common.PtrInt64(500)
+		c.WaitingPodSchedulingBlockMilliSec = common.PtrInt64(0)
 	}
 	if c.PhysicalCluster == nil {
 		c.PhysicalCluster = defaultPhysicalCluster()

@@ -40,6 +40,7 @@ import (
 	"k8s.io/klog"
 	ei "k8s.io/kubernetes/pkg/scheduler/api"
 	"sync"
+	"time"
 )
 
 // HivedScheduler is the scheduling framework which serves as the bridge between
@@ -516,6 +517,7 @@ func (s *HivedScheduler) filterRoutine(args ei.ExtenderArgs) *ei.ExtenderFilterR
 		if s.shouldForceBind(s.podScheduleStatuses[pod.UID], suggestedNodes) {
 			go s.forceBindExecutor(bindingPod)
 		}
+		klog.Infof(logPfx + "Pod is binding: %v", result.PodBindInfo)
 		return &ei.ExtenderFilterResult{
 			NodeNames: &[]string{bindingPod.Spec.NodeName},
 		}
@@ -538,6 +540,7 @@ func (s *HivedScheduler) filterRoutine(args ei.ExtenderArgs) *ei.ExtenderFilterR
 				failedNodes[node] += ", " + internal.Key(victim)
 			}
 		}
+		klog.Infof(logPfx + "Pod is preempting: %v", result.PodPreemptInfo)
 		return &ei.ExtenderFilterResult{
 			FailedNodes: failedNodes,
 		}
@@ -548,11 +551,18 @@ func (s *HivedScheduler) filterRoutine(args ei.ExtenderArgs) *ei.ExtenderFilterR
 			PodScheduleResult: &result,
 		}
 
+		// Block the whole scheduling to achieve better FIFO
+		if *s.sConfig.WaitingPodSchedulingBlockMilliSec > 0 {
+			time.Sleep(time.Duration(*s.sConfig.WaitingPodSchedulingBlockMilliSec) *
+				time.Millisecond)
+		}
+
 		// Return Error to tell K8S Default Scheduler that preemption must not help.
 		waitReason := "Pod is waiting for preemptible or free resource to appear"
 		if result.PodWaitInfo != nil {
 			waitReason += ": " + result.PodWaitInfo.Reason
 		}
+		klog.Infof(logPfx + "Pod is waiting: %v", result.PodWaitInfo)
 		return &ei.ExtenderFilterResult{
 			Error: waitReason,
 		}
