@@ -63,6 +63,14 @@ type Config struct {
 	// Pod binding will be executed forcefully.
 	ForcePodBindThreshold *int32 `yaml:"forcePodBindThreshold"`
 
+	// If a Pod is decided to be PodWaiting, it will block the whole scheduling by
+	// WaitingPodSchedulingBlockSec.
+	// Large value can be used to achieve stronger FIFO scheduling by sacrificing
+	// the scheduling throughput.
+	// This is a workaround until PodMaxBackoffSeconds can be configured for
+	// K8S Default Scheduler.
+	WaitingPodSchedulingBlockSec *int64 `yaml:"waitingPodSchedulingBlockSec"`
+
 	// Specify the whole physical cluster
 	// TODO: Automatically construct it based on node info from GPU and Network Device Plugins
 	PhysicalCluster *PhysicalClusterSpec `yaml:"physicalCluster"`
