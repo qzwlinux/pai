@@ -542,7 +542,7 @@ func (s *HivedScheduler) filterRoutine(args ei.ExtenderArgs) *ei.ExtenderFilterR
 			}
 		}
 
-		klog.Infof(logPfx + "Pod is preempting: %v", common.ToJson(result.PodPreemptInfo))
+		klog.Infof(logPfx + "Pod is preempting: %v", common.ToJson(failedNodes))
 		return &ei.ExtenderFilterResult{
 			FailedNodes: failedNodes,
 		}
@@ -565,7 +565,7 @@ func (s *HivedScheduler) filterRoutine(args ei.ExtenderArgs) *ei.ExtenderFilterR
 			waitReason += ": " + result.PodWaitInfo.Reason
 		}
 
-		klog.Infof(logPfx + "Pod is waiting: %v", common.ToJson(result.PodWaitInfo))
+		klog.Infof(logPfx + waitReason)
 		return &ei.ExtenderFilterResult{
 			Error: waitReason,
 		}
